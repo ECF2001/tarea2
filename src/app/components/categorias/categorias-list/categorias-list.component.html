@@ -1,0 +1,33 @@
+<h2>{{ title }}</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Nombre</th>
+      <th scope="col">Descripción</th>
+      <th scope="col">Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (item of categorias; track $index) {
+      <tr>
+        <th scope="row">{{ item.id }}</th>
+        <td>{{ item.nombre }}</td>
+        <td>{{ item['descripción'] }}</td>
+        <td>
+          <button (click)="callModalAction.emit(item)" class="btn btn-warning me-2" type="button">
+            <i class="fas fa-pen"></i>
+          </button>
+          <button (click)="callDeleteAction.emit(item)" class="btn btn-danger" type="button">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    } @empty {
+      <tr>
+        <td colspan="4" class="text-center">No hay categorías</td>
+      </tr>
+    }
+  </tbody>
+</table>

@@ -1,0 +1,22 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="mb-0">Gestión de Productos</h1>
+  <button class="btn btn-primary" (click)="openCreate()">
+    <i class="fas fa-plus me-1"></i> Nuevo producto
+  </button>
+</div>
+
+<div *ngIf="loading()">Cargando...</div>
+
+<app-productos-list
+  [title]="'Listado'"
+  [productos]="productos()"
+  (callModalAction)="openEdit($event)"
+  (callDeleteAction)="delete($event)">
+</app-productos-list>
+
+<app-producto-form
+  [show]="showForm()"
+  [model]="editing()"
+  (closed)="closeForm()"
+  (submitted)="save($event)">
+</app-producto-form>
