@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IProducto, SaveProductoDto } from '../../../interfaces/index';
+import { IProducto, SaveProductoDto, ICategoria } from '../../../interfaces';
+import { CategoriaService } from '../../../services/categoria.service'; // 👈 add this import
 
 @Component({
   selector: 'app-producto-form',
@@ -11,6 +12,9 @@ import { IProducto, SaveProductoDto } from '../../../interfaces/index';
 })
 export class ProductoFormComponent implements OnChanges {
   private fb = inject(FormBuilder);
+  private categoriaService = inject(CategoriaService); 
+
+  categorias: ICategoria[] = []; 
 
   @Input() show = false;
   @Input() model: IProducto | null = null;
@@ -25,6 +29,10 @@ export class ProductoFormComponent implements OnChanges {
     categoriaId: [null as number | null, [Validators.required]]
   });
 
+  constructor() {
+    this.loadCategorias();
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['model']) {
       if (this.model) {
@@ -33,6 +41,7 @@ export class ProductoFormComponent implements OnChanges {
           descripción: this.model['descripción'],
           precio: this.model.precio,
           stock: this.model.stock,
+          categoriaId: this.model.categoria?.id ?? null
         });
       } else {
         this.form.reset({ precio: 0, stock: 0, categoriaId: null });
@@ -40,20 +49,34 @@ export class ProductoFormComponent implements OnChanges {
     }
   }
 
-    onSubmit(): void {
-    if (this.form.invalid) {
-        this.form.markAllAsTouched();
-        return;
-    }
+  loadCategorias(): void {
+  this.categoriaService.getAll().subscribe({
+    next: (res: ICategoria[] | { data: ICategoria[] }) => {
+      this.categorias = Array.isArray(res)
+        ? res
+        : (res.data ?? []); 
+    },
+    error: err => console.error('Error loading categorías', err)
+  });
+}
 
-    const dto: any = {
-        nombre: this.form.value.nombre!,
-        ['descripción']: this.form.value['descripción']!,
-        precio: this.form.value.precio!,
-        stock: this.form.value.stock!,
-        categoria: { id: this.form.value.categoriaId! } 
-    };
 
-    this.submitted.emit(dto);
-    }
+  onSubmit(): void {
+  if (this.form.invalid) {
+    this.form.markAllAsTouched();
+    return;
+  }
+
+
+  const dto = {
+    nombre: this.form.value.nombre!,
+    ['descripción']: this.form.value['descripción']!, 
+    precio: this.form.value.precio!,
+    stock: this.form.value.stock!,
+    categoria: { id: this.form.value.categoriaId! }   
+  };
+
+  this.submitted.emit(dto);
+  }
+
 }

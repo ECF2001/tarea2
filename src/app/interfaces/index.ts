@@ -149,5 +149,7 @@ export interface SaveProductoDto {
   ['descripción']: string;
   precio: number;
   stock: number;
-  categoriaId: number;
+  categoria: {
+    id: number;
+  };
 }
